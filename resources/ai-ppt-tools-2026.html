@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 生成 PPT 工具汇总（2026年）</title>
+<style>
+  :root {
+    --bg: #f8fafc;
+    --card: #ffffff;
+    --border: #e2e8f0;
+    --text: #1e293b;
+    --text-secondary: #64748b;
+    --accent: #2563eb;
+    --accent-light: #eff6ff;
+    --green: #059669;
+    --green-bg: #ecfdf5;
+    --yellow: #d97706;
+    --yellow-bg: #fffbeb;
+    --red: #dc2626;
+    --red-bg: #fef2f2;
+    --tag-cn: #dbeafe;
+    --tag-cn-text: #1d4ed8;
+    --tag-intl: #fce7f3;
+    --tag-intl-text: #be185d;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans SC", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 0;
+  }
+
+  /* Header */
+  .header {
+    background: linear-gradient(135deg, #1e293b, #334155);
+    color: #fff;
+    padding: 48px 24px;
+    text-align: center;
+  }
+  .header h1 { font-size: 28px; font-weight: 700; margin-bottom: 8px; }
+  .header p { color: #94a3b8; font-size: 14px; }
+  .header .meta { margin-top: 12px; font-size: 13px; color: #64748b; }
+
+  /* Container */
+  .container { max-width: 900px; margin: 0 auto; padding: 24px 16px 64px; }
+
+  /* Section title */
+  .section-title {
+    font-size: 22px; font-weight: 700; margin: 40px 0 20px;
+    padding-bottom: 8px; border-bottom: 2px solid var(--accent);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .section-title .tag {
+    font-size: 12px; font-weight: 600; padding: 2px 10px; border-radius: 999px;
+  }
+  .tag-cn { background: var(--tag-cn); color: var(--tag-cn-text); }
+  .tag-intl { background: var(--tag-intl); color: var(--tag-intl-text); }
+
+  /* Tool card */
+  .tool-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 16px;
+    transition: box-shadow 0.2s;
+  }
+  .tool-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
+
+  .tool-header {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    gap: 12px; margin-bottom: 16px; flex-wrap: wrap;
+  }
+  .tool-name {
+    font-size: 18px; font-weight: 700; color: var(--text);
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  }
+  .tool-name .index {
+    font-size: 13px; font-weight: 600; color: var(--text-secondary);
+    background: var(--bg); padding: 0 8px; border-radius: 4px;
+  }
+
+  .free-badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 999px;
+    white-space: nowrap;
+  }
+  .free-yes { background: var(--green-bg); color: var(--green); }
+  .free-limited { background: var(--yellow-bg); color: var(--yellow); }
+  .free-no { background: var(--red-bg); color: var(--red); }
+
+  .link-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--accent); color: #fff; text-decoration: none;
+    font-size: 13px; font-weight: 600; padding: 6px 16px; border-radius: 8px;
+    transition: opacity 0.2s; flex-shrink: 0;
+  }
+  .link-btn:hover { opacity: 0.9; }
+  .link-btn svg { width: 14px; height: 14px; }
+
+  .info-grid {
+    display: grid; grid-template-columns: auto 1fr; gap: 6px 16px;
+    font-size: 14px;
+  }
+  .info-grid .label {
+    color: var(--text-secondary); white-space: nowrap; font-weight: 500;
+    min-width: 72px;
+  }
+  .info-grid .value { color: var(--text); }
+  .info-grid .value a { color: var(--accent); text-decoration: none; }
+  .info-grid .value a:hover { text-decoration: underline; }
+  .info-grid .value.highlight { color: var(--green); font-weight: 600; }
+  .info-grid .value.warn { color: var(--yellow); font-weight: 600; }
+
+  .tag-group { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 12px; }
+  .scenario-tag {
+    font-size: 12px; padding: 2px 10px; border-radius: 999px;
+    background: var(--accent-light); color: var(--accent);
+  }
+
+  /* Compare table */
+  .compare-section { margin-top: 40px; }
+  .compare-table-wrap { overflow-x: auto; }
+  .compare-table {
+    width: 100%; border-collapse: collapse; font-size: 13px;
+    background: var(--card); border-radius: 12px; overflow: hidden;
+    border: 1px solid var(--border);
+  }
+  .compare-table th {
+    background: #f1f5f9; font-weight: 600; padding: 10px 8px;
+    text-align: center; white-space: nowrap; border-bottom: 2px solid var(--border);
+  }
+  .compare-table td {
+    padding: 10px 8px; text-align: center; border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+  }
+  .compare-table tr:last-child td { border-bottom: none; }
+  .compare-table tr:hover td { background: #f8fafc; }
+  .compare-table .tool-cell { text-align: left; font-weight: 600; white-space: nowrap; }
+  .compare-table .tool-cell a {
+    color: var(--accent); text-decoration: none;
+  }
+  .compare-table .tool-cell a:hover { text-decoration: underline; }
+
+  /* Advice section */
+  .advice-section { margin-top: 40px; }
+  .advice-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+  }
+  .advice-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 10px; padding: 16px;
+  }
+  .advice-card .advice-label {
+    font-size: 13px; font-weight: 600; color: var(--text-secondary);
+    margin-bottom: 6px;
+  }
+  .advice-card .advice-value {
+    font-size: 16px; font-weight: 700; color: var(--accent);
+  }
+  .advice-card .advice-alt {
+    font-size: 13px; color: var(--text-secondary); margin-top: 4px;
+  }
+
+  .summary-list {
+    margin-top: 20px; display: flex; flex-direction: column; gap: 10px;
+  }
+  .summary-item {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 10px; padding: 14px 18px;
+    display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  }
+  .summary-item .arrow { color: var(--accent); font-weight: 700; font-size: 16px; flex-shrink: 0; }
+  .summary-item .reason { color: var(--text-secondary); font-size: 13px; }
+
+  .footer { text-align: center; padding: 32px 16px; color: var(--text-secondary); font-size: 13px; }
+
+  @media (max-width: 640px) {
+    .header { padding: 32px 16px; }
+    .header h1 { font-size: 22px; }
+    .advice-grid { grid-template-columns: 1fr; }
+    .tool-header { flex-direction: column; }
+    .compare-table { font-size: 12px; }
+    .compare-table th, .compare-table td { padding: 6px 4px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>AI 生成 PPT 工具汇总</h1>
+  <p>2026 年 · 14 款工具横评 · 含直达链接</p>
+  <div class="meta">整理时间：2026-04-30 &nbsp;|&nbsp; 价格以官网最新公示为准</div>
+</div>
+
+<div class="container">
+
+  <!-- 国产工具 -->
+  <div class="section-title">
+    国产工具 <span class="tag tag-cn">7 款</span>
+  </div>
+
+  <!-- 1. 百度文库 -->
+  <div class="tool-card">
+    <div class="tool-header">
+      <div class="tool-name">
+        <span class="index">1</span>
+        百度文库智能 PPT
+        <span class="free-badge free-yes">✅ 免费无限次</span>
+      </div>
+      <a class="link-btn" href="https://wenku.baidu.com" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        直达
+      </a>
+    </div>
+    <div class="info-grid">
+      <span class="label">价格</span>
+      <span class="value">免费版无次数限制；会员 39 元/月（包年 138 元/年）</span>
+      <span class="label">优势</span>
+      <span class="value">18 亿专业文档支撑，工信安全中心六项第一，全端协同，月活 9700 万</span>
+      <span class="label">缺点</span>
+      <span class="value">高级模板需会员，风格偏商务正式</span>
+      <span class="label">场景</span>
+      <span class="value">学术论文、工作汇报、教学课件 — 中文场景全能</span>
+    </div>
+    <div class="tag-group">
+      <span class="scenario-tag">学术论文</span>
+      <span class="scenario-tag">职场汇报</span>
+      <span class="scenario-tag">教学课件</span>
+    </div>
+  </div>
+
+  <!-- 2. 讯飞智文 -->
+  <div class="tool-card">
+    <div class="tool-header">
+      <div class="tool-name">
+        <span class="index">2</span>
+        讯飞智文
+        <span class="free-badge free-limited">⚠️ 有限免费</span>
+      </div>
+      <a class="link-btn" href="https://zhiwen.xfyun.cn" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        直达
+      </a>
+    </div>
+    <div class="info-grid">
+      <span class="label">价格</span>
+      <span class="value">单次 8 元（30 页）；年费 198 元/年</span>
+      <span class="label">优势</span>
+      <span class="value">多语种生成，专业术语适配度高（金融/法律领域达 92%），支持语音输入</span>
+      <span class="label">缺点</span>
+      <span class="value">核心功能偏贵，高级图表需搭配讯飞星火</span>
+      <span class="label">场景</span>
+      <span class="value">金融、法律等专业领域；多语种场景</span>
+    </div>
+    <div class="tag-group">
+      <span class="scenario-tag">金融</span>
+      <span class="scenario-tag">法律</span>
+      <span class="scenario-tag">多语种</span>
+    </div>
+  </div>
+
+  <!-- 3. Kimi PPT -->
+  <div class="tool-card">
+    <div class="tool-header">
+      <div class="tool-name">
+        <span class="index">3</span>
+        Kimi PPT <span style="font-weight:400;font-size:13px;color:var(--text-secondary)">月之暗面</span>
+        <span class="free-badge free-limited">⚠️ 每月 3 次免费</span>
+      </div>
+      <a class="link-btn" href="https://kimi.moonshot.cn" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        直达
+      </a>
+    </div>
+    <div class="info-grid">
+      <span class="label">价格</span>
+      <span class="value">免费每月 3 次；Kimi+ 会员 49 元/月</span>
+      <span class="label">优势</span>
+      <span class="value">200k tokens 超长上下文，长文档解析准确率 96%，学术场景适配领先</span>
+      <span class="label">缺点</span>
+      <span class="value">免费次数太少，非学术模板较少，高级设计功能有限</span>
+      <span class="label">场景</span>
+      <span class="value">学术论文答辩、长文档 PPT 转换</span>
+    </div>
+    <div class="tag-group">
+      <span class="scenario-tag">学术答辩</span>
+      <span class="scenario-tag">长文档转换</span>
+    </div>
+  </div>
+
+  <!-- 4. WPS AI -->
+  <div class="tool-card">
+    <div class="tool-header">
+      <div class="tool-name">
+        <span class="index">4</span>
+        WPS AI 演示
+        <span class="free-badge free-limited">⚠️ 每日 2 次免费</span>
+      </div>
+      <a class="link-btn" href="https://www.wps.cn" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        直达
+      </a>
+    </div>
+    <div class="info-grid">
+      <span class="label">价格</span>
+      <span class="value">免费每日 2 次；超级 AI 会员 <strong>188 元/年</strong>（含超级会员 + AI 会员全部权益）</span>
+      <span class="label">优势</span>
+      <span class="value">深度集成 WPS 生态，一键转数字人视频，支持 Word/PDF/Excel/TXT 导入，200 人协作</span>
+      <span class="label">缺点</span>
+      <span class="value">模板设计偏通用，生成速度中等</span>
+      <span class="label">场景</span>
+      <span class="value">WPS 老用户、教师/学生、追求性价比</span>
+    </div>
+    <div class="tag-group">
+      <span class="scenario-tag">WPS 生态</span>
+      <span class="scenario-tag">教学课件</span>
+      <span class="scenario-tag">性价比之选</span>
+    </div>
+  </div>
+
+  <!-- 5. 豆包 PPT -->
+  <div class="tool-card">
+    <div class="tool-header">
+      <div class="tool-name">
+        <span class="index">5</span>
+        豆包 PPT 助手 <span style="font-weight:400;font-size:13px;color:var(--text-secondary)">字节跳动</span>
+        <span class="free-badge free-yes">✅ 完全免费</span>
+      </div>
+      <a class="link-btn" href="https://www.doubao.com" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        直达
+      </a>
+    </div>
+    <div class="info-grid">
+      <span class="label">价格</span>
+      <span class="value highlight">基础版完全免费，无水印无广告；Pro 版 19 元/月</span>
+      <span class="label">优势</span>
+      <span class="value">对话式生成极简单，支持篇幅选择，导出无水印可编辑，月活 3.15 亿</span>
+      <span class="label">缺点</span>
+      <span class="value">专业场景需手动微调，设计精美度一般</span>
+      <span class="label">场景</span>
+      <span class="value">学生课件、职场汇报、临时赶工</span>
+    </div>
+    <div class="tag-group">
+      <span class="scenario-tag">零预算首选</span>
+      <span class="scenario-tag">学生</span>
+      <span class="scenario-tag">临时赶工</span>
+    </div>
+  </div>
+
+  <!-- 6. AiPPT.cn -->
+  <div class="tool-card">
+    <div class="tool-header">
+      <div class="tool-name">
+        <span class="index">6</span>
+        AiPPT.cn <span style="font-weight:400;font-size:13px;color:var(--text-secondary)">北京饼干科技</span>
+        <span class="free-badge free-limited">⚠️ 送 6 次免费</span>
+      </div>
+      <a class="link-btn" href="https://www.aippt.cn" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        直达
+      </a>
+    </div>
+    <div class="info-grid">
+      <span class="label">价格</span>
+      <span class="value">免费 6 次；会员 49 元/月（年 99 元/年）；<strong>终身会员 399 元</strong></span>
+      <span class="label">优势</span>
+      <span class="value">支持 Xmind/Freemind/Markdown 导入，终身会员性价比高，App 端更便宜</span>
+      <span class="label">缺点</span>
+      <span class="value">免费次数较少，降价后老用户权益有争议</span>
+      <span class="label">场景</span>
+      <span class="value">思维导图转 PPT，高频用户推荐终身会员</span>
+    </div>
+    <div class="tag-group">
+      <span class="scenario-tag">思维导图导入</span>
+      <span class="scenario-tag">终身买断</span>
+    </div>
+  </div>
+
+  <!-- 7. 笔灵 PPT -->
+  <div class="tool-card">
+    <div class="tool-header">
+      <div class="tool-name">
+        <span class="index">7</span>
+        笔灵 PPT <span style="font-weight:400;font-size:13px;color:var(--text-secondary)">ibiling</span>
+        <span class="free-badge free-limited">⚠️ 有免费额度</span>
+      </div>
+      <a class="link-btn" href="https://ibiling.cn" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        直达
+      </a>
+    </div>
+    <div class="info-grid">
+      <span class="label">价格</span>
+      <span class="value">基础有免费额度；高级功能按量或会员订阅</span>
+      <span class="label">优势</span>
+      <span class="value">学术场景专用，上传论文自动生成答辩 PPT、自述稿、预测导师提问</span>
+      <span class="label">缺点</span>
+      <span class="value">通用场景较弱，市场声量较小</span>
+      <span class="label">场景</span>
+      <span class="value">毕业论文、毕业设计答辩专用</span>
+    </div>
+    <div class="tag-group">
+      <span class="scenario-tag">毕业论文</span>
+      <span class="scenario-tag">答辩专用</span>
+    </div>
+  </div>
+
+  <!-- 国际工具 -->
+  <div class="section-title" style="margin-top:48px;">
+    国际工具 <span class="tag tag-intl">7 款</span>
+  </div>
+
+  <!-- 8. Gamma -->
+  <div class="tool-card">
+    <div class="tool-header">
+      <div class="tool-name">
+        <span class="index">8</span>
+        Gamma
+        <span class="free-badge free-yes">✅ 有免费版</span>
+      </div>
+      <a class="link-btn" href="https://gamma.app" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        直达
+      </a>
+    </div>
+    <div class="info-grid">
+      <span class="label">价格</span>
+      <span class="value">免费 400 积分（一次性）；Plus $8/月；Pro $15-18/月</span>
+      <span class="label">优势</span>
+      <span class="value">生成极快（<1 分钟），卡片式响应式布局，60+ 语言，AI 图片生成，支持交互组件嵌入</span>
+      <span class="label">缺点</span>
+      <span class="value">积分制难预测消耗（一次 80-150 积分），PPTX 导出不可靠，免费积分不按月续</span>
+      <span class="label">场景</span>
+      <span class="value">快速原型设计、多语言演示、交互式在线展示</span>
+    </div>
+    <div class="tag-group">
+      <span class="scenario-tag">设计感最佳</span>
+      <span class="scenario-tag">快速原型</span>
+      <span class="scenario-tag">多语言</span>
+    </div>
+  </div>
+
+  <!-- 9. Beautiful.ai -->
+  <div class="tool-card">
+    <div class="tool-header">
+      <div class="tool-name">
+        <span class="index">9</span>
+        Beautiful.ai
+        <span class="free-badge free-no">❌ 仅 14 天试用</span>
+      </div>
+      <a class="link-btn" href="https://www.beautiful.ai" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        直达
+      </a>
+    </div>
+    <div class="info-grid">
+      <span class="label">价格</span>
+      <span class="value">Pro $12/用户/月（年付）；月付 $45/月（4 倍差价）；Team $40/用户/月</span>
+      <span class="label">优势</span>
+      <span class="value">Smart Slides 自动排版极精美，设计感强输出即成品，付费后无限生成无积分制</span>
+      <span class="label">缺点</span>
+      <span class="value">无免费版（试用需绑卡），月付极贵，模板灵活性差，协作锁在 Team 层</span>
+      <span class="label">场景</span>
+      <span class="value">品牌意识强且愿意年付的个人/团队</span>
+    </div>
+    <div class="tag-group">
+      <span class="scenario-tag">设计标杆</span>
+      <span class="scenario-tag">品牌一致</span>
+    </div>
+  </div>
+
+  <!-- 10. Tome -->
+  <div class="tool-card">
+    <div class="tool-header">
+      <div class="tool-name">
+        <span class="index">10</span>
+        Tome
+        <span class="free-badge free-yes">✅ 个人免费无限</span>
+      </div>
+      <a class="link-btn" href="https://tome.app" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        直达
+      </a>
+    </div>
+    <div class="info-grid">
+      <span class="label">价格</span>
+      <span class="value">免费版个人无限使用；Pro $10/月；Enterprise $32/用户/月</span>
+      <span class="label">优势</span>
+      <span class="value">叙事式布局，适合故事化表达，免费版对个人很大方</span>
+      <span class="label">缺点</span>
+      <span class="value">团队协作需付费，国际化不如 Gamma，品牌影响力下降</span>
+      <span class="label">场景</span>
+      <span class="value">个人创意展示、故事化叙事</span>
+    </div>
+    <div class="tag-group">
+      <span class="scenario-tag">故事化表达</span>
+      <span class="scenario-tag">个人创意</span>
+    </div>
+  </div>
+
+  <!-- 11. Canva -->
+  <div class="tool-card">
+    <div class="tool-header">
+      <div class="tool-name">
+        <span class="index">11</span>
+        Canva AI <span style="font-weight:400;font-size:13px;color:var(--text-secondary)">Magic Design</span>
+        <span class="free-badge free-yes">✅ 有免费版</span>
+      </div>
+      <a class="link-btn" href="https://www.canva.com" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        直达
+      </a>
+    </div>
+    <div class="info-grid">
+      <span class="label">价格</span>
+      <span class="value">免费可用（25 次 Magic Write/月）；Pro $13-15/月；Teams $10-20/用户/月</span>
+      <span class="label">优势</span>
+      <span class="value">100 万+免费模板，生态完善（图片/视频/素材一体），Brand Kit，协作成熟</span>
+      <span class="label">缺点</span>
+      <span class="value">AI 输出偏模板化需手动调教，提示词上限 ~100 字符，高级 AI 锁在 Pro+</span>
+      <span class="label">场景</span>
+      <span class="value">通用设计，素材生态丰富，团队协作</span>
+    </div>
+    <div class="tag-group">
+      <span class="scenario-tag">素材丰富</span>
+      <span class="scenario-tag">团队协作</span>
+      <span class="scenario-tag">通用设计</span>
+    </div>
+  </div>
+
+  <!-- 12. Slidesgo -->
+  <div class="tool-card">
+    <div class="tool-header">
+      <div class="tool-name">
+        <span class="index">12</span>
+        Slidesgo
+        <span class="free-badge free-limited">⚠️ 每月 3 次免费</span>
+      </div>
+      <a class="link-btn" href="https://slidesgo.com" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        直达
+      </a>
+    </div>
+    <div class="info-grid">
+      <span class="label">价格</span>
+      <span class="value">免费每月 3 次；Premium $2.50-$7.99/月</span>
+      <span class="label">优势</span>
+      <span class="value">15000+ 模板库，价格极低（起步 $2.5/月），支持 Google Slides & PowerPoint</span>
+      <span class="label">缺点</span>
+      <span class="value">免费版极有限，模板偏通用，AI 内容需手动修正</span>
+      <span class="label">场景</span>
+      <span class="value">预算有限的个人、课堂演示</span>
+    </div>
+    <div class="tag-group">
+      <span class="scenario-tag">低价入门</span>
+      <span class="scenario-tag">课堂演示</span>
+    </div>
+  </div>
+
+  <!-- 13. Visme -->
+  <div class="tool-card">
+    <div class="tool-header">
+      <div class="tool-name">
+        <span class="index">13</span>
+        Visme
+        <span class="free-badge free-limited">⚠️ 每月 10 积分</span>
+      </div>
+      <a class="link-btn" href="https://www.visme.co" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        直达
+      </a>
+    </div>
+    <div class="info-grid">
+      <span class="label">价格</span>
+      <span class="value">免费每月 10 AI 积分；Starter $12.25/月（年付）；Pro $24.75/月</span>
+      <span class="label">优势</span>
+      <span class="value">数据可视化能力强，信息图表出色，品牌管理工具完善</span>
+      <span class="label">缺点</span>
+      <span class="value">AI 积分少，免费版有水印且仅导出 JPG/PNG</span>
+      <span class="label">场景</span>
+      <span class="value">数据密集型演示、信息图表</span>
+    </div>
+    <div class="tag-group">
+      <span class="scenario-tag">数据可视化</span>
+      <span class="scenario-tag">信息图表</span>
+    </div>
+  </div>
+
+  <!-- 14. Plus AI -->
+  <div class="tool-card">
+    <div class="tool-header">
+      <div class="tool-name">
+        <span class="index">14</span>
+        Plus AI <span style="font-weight:400;font-size:13px;color:var(--text-secondary)">Google Slides 插件</span>
+        <span class="free-badge free-no">❌ 仅 7 天试用</span>
+      </div>
+      <a class="link-btn" href="https://www.plusai.com" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        直达
+      </a>
+    </div>
+    <div class="info-grid">
+      <span class="label">价格</span>
+      <span class="value">Basic $10/用户/月（年付）；Pro $20/用户/月；Team $30/用户/月</span>
+      <span class="label">优势</span>
+      <span class="value">原生嵌入 Google Slides & PowerPoint，不改变工作流，Remix 一键重排版</span>
+      <span class="label">缺点</span>
+      <span class="value">无免费版（试用需绑卡），价格逐级攀升</span>
+      <span class="label">场景</span>
+      <span class="value">Google Slides 重度用户、团队标准化工作流</span>
+    </div>
+    <div class="tag-group">
+      <span class="scenario-tag">Google Slides</span>
+      <span class="scenario-tag">团队标准</span>
+    </div>
+  </div>
+
+  <!-- 对比总表 -->
+  <div class="compare-section">
+    <div class="section-title">快速对比总表</div>
+    <div class="compare-table-wrap">
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th>工具</th>
+            <th>免费版</th>
+            <th>付费起步</th>
+            <th>生成速度</th>
+            <th>设计质量</th>
+            <th>中文适配</th>
+            <th>导出格式</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="tool-cell"><a href="https://wenku.baidu.com" target="_blank">百度文库 PPT</a></td>
+            <td style="color:var(--green)">✅ 无限次</td>
+            <td>39 元/月</td>
+            <td>⭐⭐⭐⭐⭐</td>
+            <td>⭐⭐⭐⭐</td>
+            <td>⭐⭐⭐⭐⭐</td>
+            <td>PPTX/PDF</td>
+          </tr>
+          <tr>
+            <td class="tool-cell"><a href="https://www.doubao.com" target="_blank">豆包 PPT</a></td>
+            <td style="color:var(--green)">✅ 完全免费</td>
+            <td>19 元/月</td>
+            <td>⭐⭐⭐⭐</td>
+            <td>⭐⭐⭐</td>
+            <td>⭐⭐⭐⭐⭐</td>
+            <td>PPTX/PDF</td>
+          </tr>
+          <tr>
+            <td class="tool-cell"><a href="https://www.wps.cn" target="_blank">WPS AI</a></td>
+            <td style="color:var(--yellow)">⚠️ 每日 2 次</td>
+            <td>188 元/年</td>
+            <td>⭐⭐⭐</td>
+            <td>⭐⭐⭐</td>
+            <td>⭐⭐⭐⭐⭐</td>
+            <td>PPTX/PDF</td>
+          </tr>
+          <tr>
+            <td class="tool-cell"><a href="https://kimi.moonshot.cn" target="_blank">Kimi PPT</a></td>
+            <td style="color:var(--yellow)">⚠️ 每月 3 次</td>
+            <td>49 元/月</td>
+            <td>⭐⭐⭐⭐</td>
+            <td>⭐⭐⭐</td>
+            <td>⭐⭐⭐⭐⭐</td>
+            <td>PPTX/PDF</td>
+          </tr>
+          <tr>
+            <td class="tool-cell"><a href="https://zhiwen.xfyun.cn" target="_blank">讯飞智文</a></td>
+            <td style="color:var(--yellow)">⚠️ 有限免费</td>
+            <td>8 元/次</td>
+            <td>⭐⭐⭐</td>
+            <td>⭐⭐⭐⭐</td>
+            <td>⭐⭐⭐⭐⭐</td>
+            <td>PPTX/PDF/视频</td>
+          </tr>
+          <tr>
+            <td class="tool-cell"><a href="https://www.aippt.cn" target="_blank">AiPPT.cn</a></td>
+            <td style="color:var(--yellow)">⚠️ 6 次</td>
+            <td>49 元/月</td>
+            <td>⭐⭐⭐⭐</td>
+            <td>⭐⭐⭐</td>
+            <td>⭐⭐⭐⭐⭐</td>
+            <td>PPTX/PDF</td>
+          </tr>
+          <tr>
+            <td class="tool-cell"><a href="https://gamma.app" target="_blank">Gamma</a></td>
+            <td style="color:var(--green)">✅ 400 积分</td>
+            <td>$8/月</td>
+            <td>⭐⭐⭐⭐⭐</td>
+            <td>⭐⭐⭐⭐⭐</td>
+            <td>⭐⭐⭐</td>
+            <td>PDF/PPTX/PNG</td>
+          </tr>
+          <tr>
+            <td class="tool-cell"><a href="https://www.beautiful.ai" target="_blank">Beautiful.ai</a></td>
+            <td style="color:var(--red)">❌ 仅试用</td>
+            <td>$12/月</td>
+            <td>⭐⭐⭐⭐</td>
+            <td>⭐⭐⭐⭐⭐</td>
+            <td>⭐⭐</td>
+            <td>PPTX/PDF</td>
+          </tr>
+          <tr>
+            <td class="tool-cell"><a href="https://www.canva.com" target="_blank">Canva</a></td>
+            <td style="color:var(--green)">✅ 有免费版</td>
+            <td>$13/月</td>
+            <td>⭐⭐⭐</td>
+            <td>⭐⭐⭐⭐</td>
+            <td>⭐⭐⭐</td>
+            <td>PPTX/PDF/多格式</td>
+          </tr>
+          <tr>
+            <td class="tool-cell"><a href="https://tome.app" target="_blank">Tome</a></td>
+            <td style="color:var(--green)">✅ 个人无限</td>
+            <td>$10/月</td>
+            <td>⭐⭐⭐⭐</td>
+            <td>⭐⭐⭐⭐</td>
+            <td>⭐⭐</td>
+            <td>PDF</td>
+          </tr>
+          <tr>
+            <td class="tool-cell"><a href="https://slidesgo.com" target="_blank">Slidesgo</a></td>
+            <td style="color:var(--yellow)">⚠️ 每月 3 次</td>
+            <td>$2.5/月</td>
+            <td>⭐⭐⭐</td>
+            <td>⭐⭐⭐</td>
+            <td>⭐⭐</td>
+            <td>PPTX/PDF</td>
+          </tr>
+          <tr>
+            <td class="tool-cell"><a href="https://www.visme.co" target="_blank">Visme</a></td>
+            <td style="color:var(--yellow)">⚠️ 10 积分/月</td>
+            <td>$12.25/月</td>
+            <td>⭐⭐⭐</td>
+            <td>⭐⭐⭐⭐</td>
+            <td>⭐⭐</td>
+            <td>JPG/PNG/PDF</td>
+          </tr>
+          <tr>
+            <td class="tool-cell"><a href="https://www.plusai.com" target="_blank">Plus AI</a></td>
+            <td style="color:var(--red)">❌ 仅试用</td>
+            <td>$10/月</td>
+            <td>⭐⭐⭐⭐</td>
+            <td>⭐⭐⭐</td>
+            <td>⭐⭐</td>
+            <td>Google Slides</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 选型建议 -->
+  <div class="advice-section">
+    <div class="section-title">选型建议</div>
+
+    <div class="advice-grid">
+      <div class="advice-card">
+        <div class="advice-label">🎓 学生 / 论文答辩</div>
+        <div class="advice-value">百度文库 PPT</div>
+        <div class="advice-alt">备选：Kimi PPT、笔灵 PPT</div>
+      </div>
+      <div class="advice-card">
+        <div class="advice-label">💼 职场汇报</div>
+        <div class="advice-value">百度文库 PPT / WPS AI</div>
+        <div class="advice-alt">备选：豆包 PPT（免费够用）</div>
+      </div>
+      <div class="advice-card">
+        <div class="advice-label">🎨 设计 / 创意</div>
+        <div class="advice-value">Gamma</div>
+        <div class="advice-alt">备选：Beautiful.ai、Canva</div>
+      </div>
+      <div class="advice-card">
+        <div class="advice-label">📊 数据可视化</div>
+        <div class="advice-value">Visme</div>
+        <div class="advice-alt">备选：Canva</div>
+      </div>
+      <div class="advice-card">
+        <div class="advice-label">🔤 Google Slides 用户</div>
+        <div class="advice-value">Plus AI</div>
+        <div class="advice-alt">备选：Slidesgo</div>
+      </div>
+      <div class="advice-card">
+        <div class="advice-label">💰 零预算</div>
+        <div class="advice-value">豆包 PPT</div>
+        <div class="advice-alt">备选：百度文库 PPT</div>
+      </div>
+    </div>
+
+    <div class="summary-list">
+      <div class="summary-item">
+        <span class="arrow">→</span>
+        <strong>中文场景要全能</strong>
+        <span class="reason">百度文库 PPT — 免费无限次，18 亿文档支撑内容可信</span>
+      </div>
+      <div class="summary-item">
+        <span class="arrow">→</span>
+        <strong>完全不要钱</strong>
+        <span class="reason">豆包 PPT — 核心功能全免费，无水印无广告</span>
+      </div>
+      <div class="summary-item">
+        <span class="arrow">→</span>
+        <strong>追求设计感</strong>
+        <span class="reason">Gamma — 卡片式布局，交互能力强，60+ 语言</span>
+      </div>
+      <div class="summary-item">
+        <span class="arrow">→</span>
+        <strong>学术论文专用</strong>
+        <span class="reason">Kimi PPT 或 笔灵 PPT — 长文档理解最强，200k 上下文</span>
+      </div>
+      <div class="summary-item">
+        <span class="arrow">→</span>
+        <strong>WPS 生态用户</strong>
+        <span class="reason">WPS AI — 188 元/年全家桶，无需切换软件</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">
+  数据来源：2026 年各媒体横评文章及官方定价页面 &nbsp;·&nbsp; 信息仅供学习参考
+</div>
+
+</body>
+</html>

@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+.venv/
+venv/
+.env
+
+# System
+.DS_Store
+Thumbs.db
+
+# Scratch
+code/scratch/*
+
+# IDE
+.idea/
+.vscode/
+.claude/settings.local.json
